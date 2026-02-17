@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChristianWriter.ai
+
+AI-powered writing tools for Christian content creators. Create devotionals, sermons, and social media content with Scripture at the center.
+
+## Features
+
+- **Devotional Generator** - Create meaningful daily devotionals with Scripture references, reflection questions, and practical applications
+- **Sermon Outline Generator** - Generate structured sermon outlines in expository, topical, or narrative styles
+- **Social Media Content** - Craft engaging posts optimized for Twitter, Facebook, Instagram, and LinkedIn
+- **Author Voice Matching** - Train the AI to match your unique writing style
+- **Scripture Integration** - Access NIV, ESV, KJV, and more Bible versions
+- **Export Options** - Download content as Word documents or text files
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router) + TypeScript
+- **Styling**: Tailwind CSS (dark theme)
+- **Database**: PostgreSQL via Neon (serverless)
+- **ORM**: Drizzle ORM
+- **Auth**: NextAuth.js v5 (Google OAuth + credentials)
+- **AI**: Anthropic Claude API
+- **Export**: docx + file-saver
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+
+- PostgreSQL database (Neon recommended)
+- Anthropic API key
+- Google OAuth credentials (optional)
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd christianwriter-ai
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env.local` with your credentials:
+```env
+DATABASE_URL=postgresql://...
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+ANTHROPIC_API_KEY=sk-ant-...
+```
 
-## Learn More
+4. Set up the database:
+```bash
+npm run db:push
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. Start the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Visit [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
+
+```
+christianwriter-ai/
+├── src/
+│   ├── app/
+│   │   ├── (marketing)/      # Landing, pricing, features pages
+│   │   ├── (auth)/           # Sign-in, sign-up pages
+│   │   ├── (dashboard)/      # Protected routes
+│   │   │   ├── dashboard/
+│   │   │   │   ├── devotionals/
+│   │   │   │   ├── sermons/
+│   │   │   │   ├── social/
+│   │   │   │   ├── author-voice/
+│   │   │   │   └── history/
+│   │   └── api/              # API routes
+│   ├── components/
+│   │   ├── ui/               # Base components (Button, Card, Input, etc.)
+│   │   ├── layout/           # Navbar, Footer, Sidebar
+│   │   ├── generators/       # Content creation forms
+│   │   └── marketing/        # Landing page sections
+│   └── lib/
+│       ├── db/               # Drizzle schema + connection
+│       ├── ai/               # Claude client + prompts
+│       ├── scripture/        # Bible API integration
+│       ├── export/           # PDF/Word export utilities
+│       └── utils/            # Helper functions
+```
+
+## Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run db:generate` - Generate database migrations
+- `npm run db:push` - Push schema to database
+- `npm run db:studio` - Open Drizzle Studio
+
+## Theological Guardrails
+
+The AI is configured with theological guardrails to ensure:
+- Scripture-first content generation
+- Theological accuracy (Trinity, deity of Christ, salvation by grace)
+- Pastoral sensitivity
+- Human-in-the-loop philosophy (generates outlines, not final content)
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push your code to GitHub
+2. Import the project to Vercel
+3. Add your environment variables in Vercel's dashboard
+4. Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT
