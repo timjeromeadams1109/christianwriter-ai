@@ -2,17 +2,49 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, Input } from '@/components/ui';
-import { Chrome } from 'lucide-react';
+import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, Input, Badge } from '@/components/ui';
+import { Chrome, Crown } from 'lucide-react';
+import { TIER_NAMES, type SubscriptionTier } from '@/lib/stripe/config';
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get plan from URL params
+  const planParam = searchParams.get('plan') as SubscriptionTier | null;
+  const redirectParam = searchParams.get('redirect');
+  const selectedPlan = planParam && ['pro', 'ministry'].includes(planParam) ? planParam : null;
+
+  const handleCheckout = async (tier: SubscriptionTier) => {
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tier }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      router.push('/dashboard');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +60,9 @@ export default function SignInPage() {
 
       if (result?.error) {
         setError('Invalid email or password');
+      } else if (redirectParam === 'checkout' && selectedPlan) {
+        // Redirect to checkout with selected plan
+        await handleCheckout(selectedPlan);
       } else {
         router.push('/dashboard');
       }
@@ -39,7 +74,12 @@ export default function SignInPage() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/dashboard' });
+    // Preserve plan and redirect in callback URL
+    let callbackUrl = '/dashboard';
+    if (redirectParam === 'checkout' && selectedPlan) {
+      callbackUrl = `/api/checkout-redirect?plan=${selectedPlan}`;
+    }
+    signIn('google', { callbackUrl });
   };
 
   return (
@@ -47,6 +87,18 @@ export default function SignInPage() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Welcome Back</CardTitle>
         <CardDescription>Sign in to continue to ChristianWriter.ai</CardDescription>
+
+        {/* Show selected plan */}
+        {selectedPlan && (
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <Crown className="h-4 w-4 text-accent" />
+            <span className="text-sm text-foreground-muted">
+              Continue to{' '}
+              <Badge variant="accent">{TIER_NAMES[selectedPlan]}</Badge>{' '}
+              checkout
+            </span>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         {/* Google Sign In */}
@@ -99,14 +151,17 @@ export default function SignInPage() {
           />
 
           <Button type="submit" fullWidth isLoading={isLoading}>
-            Sign In
+            {selectedPlan ? 'Sign In & Continue to Payment' : 'Sign In'}
           </Button>
         </form>
 
         {/* Sign Up Link */}
         <p className="mt-6 text-center text-sm text-foreground-muted">
           Don&apos;t have an account?{' '}
-          <Link href="/sign-up" className="text-accent hover:underline">
+          <Link
+            href={selectedPlan ? `/sign-up?plan=${selectedPlan}&redirect=checkout` : '/sign-up'}
+            className="text-accent hover:underline"
+          >
             Sign up
           </Link>
         </p>

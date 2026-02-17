@@ -4,6 +4,7 @@ import { pgTable, text, timestamp, uuid, json, pgEnum, boolean, integer, primary
 export const contentTypeEnum = pgEnum('content_type', ['devotional', 'sermon', 'social']);
 export const contentStatusEnum = pgEnum('content_status', ['draft', 'generated', 'expanded', 'published']);
 export const socialPlatformEnum = pgEnum('social_platform', ['twitter', 'facebook', 'instagram', 'linkedin']);
+export const subscriptionTierEnum = pgEnum('subscription_tier', ['free', 'pro', 'ministry']);
 
 // Users table - compatible with NextAuth Drizzle adapter
 export const users = pgTable('users', {
@@ -14,6 +15,11 @@ export const users = pgTable('users', {
   image: text('image'),
   hashedPassword: text('hashed_password'),
   preferredBibleVersion: text('preferred_bible_version').default('NIV'),
+  // Stripe subscription fields
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  subscriptionTier: subscriptionTierEnum('subscription_tier').default('free').notNull(),
+  subscriptionStatus: text('subscription_status'), // 'active', 'canceled', 'past_due', etc.
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
