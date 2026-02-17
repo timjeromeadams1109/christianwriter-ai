@@ -123,7 +123,7 @@ export default function PricingPage() {
   const [hoveredTier, setHoveredTier] = useState<SubscriptionTier | null>(null);
 
   const handleSelectPlan = async (tier: SubscriptionTier) => {
-    if (loadingTier !== null || status === 'loading') return;
+    if (loadingTier !== null) return;
 
     if (tier === 'free') {
       if (session) {
@@ -257,7 +257,7 @@ export default function PricingPage() {
             const Icon = plan.icon;
             const isLoading = loadingTier === plan.tier;
             const isHovered = hoveredTier === plan.tier;
-            const isDisabled = loadingTier !== null || status === 'loading';
+            const isDisabled = loadingTier !== null;
 
             return (
               <motion.div
