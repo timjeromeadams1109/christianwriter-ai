@@ -2,6 +2,7 @@ declare module "@stack/core" {
   export interface CircuitBreakerConfig {
     name?: string;
     timeout?: number;
+    errorThreshold?: number;
     errorThresholdPercentage?: number;
     resetTimeout?: number;
     volumeThreshold?: number;
@@ -13,6 +14,7 @@ declare module "@stack/core" {
   export class ServiceCircuitBreaker<T extends unknown[] = unknown[], R = unknown> {
     fire(...args: T): Promise<R>;
     isOpen(): boolean;
+    isHealthy(): boolean;
     getStats(): any;
   }
 
