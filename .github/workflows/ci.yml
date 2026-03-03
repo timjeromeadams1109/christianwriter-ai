@@ -21,7 +21,12 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+
+
         run: npm ci
+
+      - name: Install @stack/core from source
+        run: npm install --no-save github:timjeromeadams1109/stack-core
 
       - name: Lint
         run: npm run lint
