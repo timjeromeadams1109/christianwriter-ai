@@ -2,73 +2,69 @@
 
 AI-powered writing tools for Christian content creators. Create devotionals, sermons, and social media content with Scripture at the center.
 
-## Features
-
-- **Devotional Generator** - Create meaningful daily devotionals with Scripture references, reflection questions, and practical applications
-- **Sermon Outline Generator** - Generate structured sermon outlines in expository, topical, or narrative styles
-- **Social Media Content** - Craft engaging posts optimized for Twitter, Facebook, Instagram, and LinkedIn
-- **Author Voice Matching** - Train the AI to match your unique writing style
-- **Scripture Integration** - Access NIV, ESV, KJV, and more Bible versions
-- **Export Options** - Download content as Word documents or text files
-
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router) + TypeScript
-- **Styling**: Tailwind CSS (dark theme)
-- **Database**: PostgreSQL via Neon (serverless)
-- **ORM**: Drizzle ORM
-- **Auth**: NextAuth.js v5 (Google OAuth + credentials)
-- **AI**: Anthropic Claude API
-- **Export**: docx + file-saver
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 16 (App Router) + TypeScript |
+| Styling | Tailwind CSS (dark theme) |
+| Database | PostgreSQL via Neon (serverless) |
+| ORM | Drizzle ORM |
+| Auth | NextAuth.js v5 (Google OAuth + credentials) |
+| AI | Anthropic Claude API |
+| Payments | Stripe (subscriptions) |
+| Export | docx + React-PDF |
+
+
+## Features
+
+- **Devotional Generator** — Create meaningful daily devotionals with Scripture references and reflection questions
+- **Sermon Outline Generator** — Generate structured sermon outlines in expository, topical, or narrative styles
+- **Social Media Content** — Craft engaging posts optimized for Twitter, Facebook, Instagram, and LinkedIn
+- **Author Voice Matching** — Train the AI to match your unique writing style
+- **Scripture Integration** — Access NIV, ESV, KJV, and more Bible versions
+- **Export Options** — Download content as Word documents or PDF files
+- **Theological Guardrails** — AI configured for Scripture-first, theologically accurate content generation
+
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- PostgreSQL database (Neon recommended)
+- Neon PostgreSQL database
 - Anthropic API key
-- Google OAuth credentials (optional)
+- Stripe account
 
 ### Installation
 
-1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/timjeromeadams1109/christianwriter-ai.git
 cd christianwriter-ai
-```
-
-2. Install dependencies:
-```bash
 npm install
 ```
 
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
+### Environment Variables
 
-Edit `.env.local` with your credentials:
-```env
-DATABASE_URL=postgresql://...
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-ANTHROPIC_API_KEY=sk-ant-...
-```
+Copy `.env.local.example` to `.env.local` and configure:
 
-4. Set up the database:
-```bash
-npm run db:push
-```
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Neon PostgreSQL connection string |
+| `NEXTAUTH_URL` | Application URL for NextAuth |
+| `NEXTAUTH_SECRET` | NextAuth encryption secret |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `ANTHROPIC_API_KEY` | Anthropic Claude API key |
+| `STRIPE_SECRET_KEY` | Stripe secret API key |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
 
-5. Start the development server:
+### Run
+
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the app.
 
 ## Project Structure
 
@@ -79,15 +75,14 @@ christianwriter-ai/
 │   │   ├── (marketing)/      # Landing, pricing, features pages
 │   │   ├── (auth)/           # Sign-in, sign-up pages
 │   │   ├── (dashboard)/      # Protected routes
-│   │   │   ├── dashboard/
-│   │   │   │   ├── devotionals/
-│   │   │   │   ├── sermons/
-│   │   │   │   ├── social/
-│   │   │   │   ├── author-voice/
-│   │   │   │   └── history/
+│   │   │   └── dashboard/
+│   │   │       ├── devotionals/
+│   │   │       ├── sermons/
+│   │   │       ├── social/
+│   │   │       └── author-voice/
 │   │   └── api/              # API routes
 │   ├── components/
-│   │   ├── ui/               # Base components (Button, Card, Input, etc.)
+│   │   ├── ui/               # Base components
 │   │   ├── layout/           # Navbar, Footer, Sidebar
 │   │   ├── generators/       # Content creation forms
 │   │   └── marketing/        # Landing page sections
@@ -95,35 +90,44 @@ christianwriter-ai/
 │       ├── db/               # Drizzle schema + connection
 │       ├── ai/               # Claude client + prompts
 │       ├── scripture/        # Bible API integration
-│       ├── export/           # PDF/Word export utilities
-│       └── utils/            # Helper functions
+│       └── export/           # PDF/Word export utilities
+├── drizzle/                  # Migration files
+└── scripts/                  # Build & generation scripts
 ```
+
 
 ## Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run db:generate` - Generate database migrations
-- `npm run db:push` - Push schema to database
-- `npm run db:studio` - Open Drizzle Studio
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | next dev |
+| `npm run build` | next build |
+| `npm run start` | next start |
+| `npm run lint` | eslint |
+| `npm run db:generate` | drizzle-kit generate |
+| `npm run db:migrate` | drizzle-kit migrate |
+| `npm run db:push` | drizzle-kit push |
+| `npm run db:studio` | drizzle-kit studio |
 
-## Theological Guardrails
 
-The AI is configured with theological guardrails to ensure:
-- Scripture-first content generation
-- Theological accuracy (Trinity, deity of Christ, salvation by grace)
-- Pastoral sensitivity
-- Human-in-the-loop philosophy (generates outlines, not final content)
+## Deployment
 
-## Deploy on Vercel
+Deployed on **Vercel** with automatic deploys from the `main` branch.
 
-1. Push your code to GitHub
-2. Import the project to Vercel
-3. Add your environment variables in Vercel's dashboard
-4. Deploy
+1. Push to `main` triggers Vercel build
+2. Configure env vars in Vercel dashboard
+3. Database hosted on Neon (serverless PostgreSQL)
+
+
+## Links
+
+- [GitHub](https://github.com/timjeromeadams1109/christianwriter-ai)
+- [Vercel Dashboard](https://vercel.com/tim-adams-projects-6c46d12d/christianwriter-ai)
+
 
 ## License
 
 MIT
+
+---
+*Auto-generated from project.meta.json — do not edit manually.*

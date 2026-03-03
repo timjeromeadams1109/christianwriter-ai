@@ -1,0 +1,42 @@
+{
+  "name": "christianwriter-ai",
+  "displayName": "ChristianWriter.ai",
+  "repoName": "christianwriter-ai",
+  "description": "AI-powered writing tools for Christian content creators. Create devotionals, sermons, and social media content with Scripture at the center.",
+  "techStack": {
+    "Framework": "Next.js 16 (App Router) + TypeScript",
+    "Styling": "Tailwind CSS (dark theme)",
+    "Database": "PostgreSQL via Neon (serverless)",
+    "ORM": "Drizzle ORM",
+    "Auth": "NextAuth.js v5 (Google OAuth + credentials)",
+    "AI": "Anthropic Claude API",
+    "Payments": "Stripe (subscriptions)",
+    "Export": "docx + React-PDF"
+  },
+  "features": [
+    { "name": "Devotional Generator", "description": "Create meaningful daily devotionals with Scripture references and reflection questions" },
+    { "name": "Sermon Outline Generator", "description": "Generate structured sermon outlines in expository, topical, or narrative styles" },
+    { "name": "Social Media Content", "description": "Craft engaging posts optimized for Twitter, Facebook, Instagram, and LinkedIn" },
+    { "name": "Author Voice Matching", "description": "Train the AI to match your unique writing style" },
+    { "name": "Scripture Integration", "description": "Access NIV, ESV, KJV, and more Bible versions" },
+    { "name": "Export Options", "description": "Download content as Word documents or PDF files" },
+    { "name": "Theological Guardrails", "description": "AI configured for Scripture-first, theologically accurate content generation" }
+  ],
+  "envVars": [
+    { "name": "DATABASE_URL", "description": "Neon PostgreSQL connection string" },
+    { "name": "NEXTAUTH_URL", "description": "Application URL for NextAuth" },
+    { "name": "NEXTAUTH_SECRET", "description": "NextAuth encryption secret" },
+    { "name": "GOOGLE_CLIENT_ID", "description": "Google OAuth client ID" },
+    { "name": "GOOGLE_CLIENT_SECRET", "description": "Google OAuth client secret" },
+    { "name": "ANTHROPIC_API_KEY", "description": "Anthropic Claude API key" },
+    { "name": "STRIPE_SECRET_KEY", "description": "Stripe secret API key" },
+    { "name": "STRIPE_WEBHOOK_SECRET", "description": "Stripe webhook signing secret" }
+  ],
+  "projectStructure": "christianwriter-ai/\n├── src/\n│   ├── app/\n│   │   ├── (marketing)/      # Landing, pricing, features pages\n│   │   ├── (auth)/           # Sign-in, sign-up pages\n│   │   ├── (dashboard)/      # Protected routes\n│   │   │   └── dashboard/\n│   │   │       ├── devotionals/\n│   │   │       ├── sermons/\n│   │   │       ├── social/\n│   │   │       └── author-voice/\n│   │   └── api/              # API routes\n│   ├── components/\n│   │   ├── ui/               # Base components\n│   │   ├── layout/           # Navbar, Footer, Sidebar\n│   │   ├── generators/       # Content creation forms\n│   │   └── marketing/        # Landing page sections\n│   └── lib/\n│       ├── db/               # Drizzle schema + connection\n│       ├── ai/               # Claude client + prompts\n│       ├── scripture/        # Bible API integration\n│       └── export/           # PDF/Word export utilities\n├── drizzle/                  # Migration files\n└── scripts/                  # Build & generation scripts",
+  "deployment": "Deployed on **Vercel** with automatic deploys from the `main` branch.\n\n1. Push to `main` triggers Vercel build\n2. Configure env vars in Vercel dashboard\n3. Database hosted on Neon (serverless PostgreSQL)",
+  "links": {
+    "GitHub": "https://github.com/timjeromeadams1109/christianwriter-ai",
+    "Vercel Dashboard": "https://vercel.com/tim-adams-projects-6c46d12d/christianwriter-ai"
+  },
+  "license": "MIT"
+}
