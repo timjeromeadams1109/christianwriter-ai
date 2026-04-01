@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import Anthropic from '@anthropic-ai/sdk';
+import { validate, journalSeriesSchema } from '@/lib/validation';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -102,24 +103,19 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const parsed = validate(journalSeriesSchema, body);
+    if ('error' in parsed) return parsed.error;
     const {
-      mode = 'devotional',
-      duration = 7,
+      mode,
+      duration,
       topic,
       description,
-      tone = 'encouraging',
-      audience = 'general',
-      bibleVersion = 'NIV',
-      includePrayer = true,
-      includeReflection = true,
-    } = body;
-
-    if (!topic) {
-      return NextResponse.json(
-        { error: 'Topic is required' },
-        { status: 400 }
-      );
-    }
+      tone,
+      audience,
+      bibleVersion,
+      includePrayer,
+      includeReflection,
+    } = parsed.data;
 
     const prompt = JOURNAL_SERIES_PROMPT({
       mode,

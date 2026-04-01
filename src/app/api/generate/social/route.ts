@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { SOCIAL_PROMPT } from '@/lib/ai';
 import Anthropic from '@anthropic-ai/sdk';
+import { validate, socialSchema } from '@/lib/validation';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -19,21 +20,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const parsed = validate(socialSchema, body);
+    if ('error' in parsed) return parsed.error;
     const {
       topic,
       scripture,
-      platform = 'twitter',
-      tone = 'encouraging',
-      bibleVersion = 'NIV',
+      platform,
+      tone,
+      bibleVersion,
       voiceInstructions,
-    } = body;
-
-    if (!topic) {
-      return NextResponse.json(
-        { error: 'Topic is required' },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const prompt = SOCIAL_PROMPT(
       topic,

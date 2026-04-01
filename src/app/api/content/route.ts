@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { content } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
+import { validate, contentSaveSchema } from '@/lib/validation';
 
 export async function GET() {
   try {
@@ -43,6 +44,8 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const parsed = validate(contentSaveSchema, body);
+    if ('error' in parsed) return parsed.error;
     const {
       type,
       title,
@@ -50,14 +53,7 @@ export async function POST(request: Request) {
       generatedContent,
       scriptureReferences,
       authorVoiceId,
-    } = body;
-
-    if (!type || !title) {
-      return NextResponse.json(
-        { error: 'Type and title are required' },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const [newContent] = await db
       .insert(content)

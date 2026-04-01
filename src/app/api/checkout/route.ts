@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { getPriceIdForTier, type SubscriptionTier } from '@/lib/stripe/config';
+import { validate, checkoutSchema } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,9 +19,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const tier = body.tier as SubscriptionTier;
+    const parsed = validate(checkoutSchema, body);
+    if ('error' in parsed) return parsed.error;
+    const tier = parsed.data.tier as SubscriptionTier;
 
-    if (!tier || tier === 'free') {
+    if (tier === 'free') {
       return NextResponse.json(
         { error: 'Invalid subscription tier' },
         { status: 400 }

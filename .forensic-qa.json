@@ -1,0 +1,41 @@
+{
+  "projectName": "christianwriter-ai",
+  "baseUrl": "http://localhost:3000",
+  "pages": [
+    { "path": "/", "name": "Home", "expectedStatus": 200 },
+    { "path": "/features", "name": "Features", "expectedStatus": 200 },
+    { "path": "/about", "name": "About", "expectedStatus": 200 },
+    { "path": "/pricing", "name": "Pricing", "expectedStatus": 200 },
+    { "path": "/sign-in", "name": "Sign In", "expectedStatus": 200 },
+    { "path": "/sign-up", "name": "Sign Up", "expectedStatus": 200 },
+    { "path": "/dashboard", "name": "Dashboard", "expectedStatus": 200 },
+    { "path": "/dashboard/sermons", "name": "Sermons", "expectedStatus": 200 },
+    { "path": "/dashboard/devotionals", "name": "Devotionals", "expectedStatus": 200 },
+    { "path": "/dashboard/journal", "name": "Journal", "expectedStatus": 200 },
+    { "path": "/dashboard/social", "name": "Social", "expectedStatus": 200 },
+    { "path": "/dashboard/author-voice", "name": "Author Voice", "expectedStatus": 200 },
+    { "path": "/dashboard/history", "name": "History", "expectedStatus": 200 },
+    { "path": "/dashboard/settings", "name": "Settings", "expectedStatus": 200 }
+  ],
+  "apiEndpoints": [
+    { "method": "GET", "path": "/api/auth/providers", "expectedStatus": 200 },
+    { "method": "GET", "path": "/api/user/subscription", "expectedStatus": 200 }
+  ],
+  "userFlows": [
+    {
+      "name": "Landing page navigation",
+      "steps": ["goto:/", "wait:1000", "click:Features", "wait:1000"]
+    },
+    {
+      "name": "Sign in page load",
+      "steps": ["goto:/sign-in", "wait:1000"]
+    }
+  ],
+  "authFlows": [],
+  "forms": [],
+  "consoleErrorThreshold": 0,
+  "performanceBudget": {
+    "firstContentfulPaint": 3000,
+    "largestContentfulPaint": 4000
+  }
+}

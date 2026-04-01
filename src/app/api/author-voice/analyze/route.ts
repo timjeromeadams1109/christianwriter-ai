@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { authorVoiceProfiles } from '@/lib/db/schema';
 import Anthropic from '@anthropic-ai/sdk';
+import { validate, voiceAnalyzeSchema } from '@/lib/validation';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -39,21 +40,9 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, sampleText } = body;
-
-    if (!name || !sampleText) {
-      return NextResponse.json(
-        { error: 'Name and sample text are required' },
-        { status: 400 }
-      );
-    }
-
-    if (sampleText.length < 500) {
-      return NextResponse.json(
-        { error: 'Sample text should be at least 500 characters for accurate analysis' },
-        { status: 400 }
-      );
-    }
+    const parsed = validate(voiceAnalyzeSchema, body);
+    if ('error' in parsed) return parsed.error;
+    const { name, sampleText } = parsed.data;
 
     // Analyze the writing sample
     const prompt = VOICE_ANALYSIS_PROMPT.replace('{SAMPLE_TEXT}', sampleText);

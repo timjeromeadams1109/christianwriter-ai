@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { SERMON_PROMPT } from '@/lib/ai';
 import Anthropic from '@anthropic-ai/sdk';
+import { validate, sermonSchema } from '@/lib/validation';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -19,21 +20,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const parsed = validate(sermonSchema, body);
+    if ('error' in parsed) return parsed.error;
     const {
       topic,
       scripture,
-      style = 'expository',
-      audience = 'general',
-      bibleVersion = 'NIV',
+      style,
+      audience,
+      bibleVersion,
       voiceInstructions,
-    } = body;
-
-    if (!topic || !scripture) {
-      return NextResponse.json(
-        { error: 'Topic and scripture are required' },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const prompt = SERMON_PROMPT(
       topic,

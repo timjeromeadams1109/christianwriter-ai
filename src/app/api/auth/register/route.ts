@@ -3,17 +3,14 @@ import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
+import { validate, registerSchema } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
+    const parsed = validate(registerSchema, body);
+    if ('error' in parsed) return parsed.error;
+    const { name, email, password } = parsed.data;
 
     // Check if user already exists
     const existingUser = await db.query.users.findFirst({
