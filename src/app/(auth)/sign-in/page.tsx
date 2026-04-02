@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
@@ -8,7 +8,7 @@ import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, Inpu
 import { Chrome, Crown } from 'lucide-react';
 import { TIER_NAMES, type SubscriptionTier } from '@/lib/stripe/config';
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -167,5 +167,19 @@ export default function SignInPage() {
         </p>
       </CardContent>
     </Card>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <Card variant="bordered" className="w-full max-w-md">
+        <CardContent className="py-12 text-center text-foreground-muted">
+          Loading...
+        </CardContent>
+      </Card>
+    }>
+      <SignInForm />
+    </Suspense>
   );
 }

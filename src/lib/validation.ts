@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
-export function validate<T>(schema: z.ZodType<T>, data: unknown): { data: T } | { error: NextResponse } {
+export function validate<S extends z.ZodTypeAny>(schema: S, data: unknown): { data: z.infer<S> } | { error: NextResponse } {
   const result = schema.safeParse(data);
   if (!result.success) {
     return { error: NextResponse.json({ error: 'Invalid request', details: result.error.flatten().fieldErrors }, { status: 400 }) };
   }
-  return { data: result.data };
+  return { data: result.data as z.infer<S> };
 }
 
 // POST /api/auth/register
@@ -18,11 +18,15 @@ export const registerSchema = z.object({
 
 // POST /api/content
 export const contentSaveSchema = z.object({
-  type: z.string().min(1),
+  type: z.enum(['devotional', 'sermon', 'social']),
   title: z.string().min(1),
   inputParams: z.record(z.unknown()).optional(),
   generatedContent: z.string().optional(),
-  scriptureReferences: z.array(z.string()).optional(),
+  scriptureReferences: z.array(z.object({
+    reference: z.string(),
+    text: z.string(),
+    version: z.string(),
+  })).optional(),
   authorVoiceId: z.string().optional(),
 });
 
@@ -41,9 +45,9 @@ export const voiceAnalyzeSchema = z.object({
 export const sermonSchema = z.object({
   topic: z.string().min(1, 'Topic is required'),
   scripture: z.string().min(1, 'Scripture is required'),
-  style: z.string().optional().default('expository'),
-  audience: z.string().optional().default('general'),
-  bibleVersion: z.string().optional().default('NIV'),
+  style: z.string().default('expository'),
+  audience: z.string().default('general'),
+  bibleVersion: z.string().default('NIV'),
   voiceInstructions: z.string().optional(),
 });
 
@@ -51,31 +55,31 @@ export const sermonSchema = z.object({
 export const devotionalSchema = z.object({
   topic: z.string().min(1, 'Topic is required'),
   scripture: z.string().min(1, 'Scripture is required'),
-  tone: z.string().optional().default('encouraging'),
-  audience: z.string().optional().default('general'),
-  bibleVersion: z.string().optional().default('NIV'),
+  tone: z.string().default('encouraging'),
+  audience: z.string().default('general'),
+  bibleVersion: z.string().default('NIV'),
   voiceInstructions: z.string().optional(),
 });
 
 // POST /api/generate/journal-series
 export const journalSeriesSchema = z.object({
-  mode: z.enum(['devotional', 'journal']).optional().default('devotional'),
-  duration: z.number().min(1).optional().default(7),
+  mode: z.enum(['devotional', 'journal']).default('devotional'),
+  duration: z.number().min(1).default(7),
   topic: z.string().min(1, 'Topic is required'),
   description: z.string().optional(),
-  tone: z.string().optional().default('encouraging'),
-  audience: z.string().optional().default('general'),
-  bibleVersion: z.string().optional().default('NIV'),
-  includePrayer: z.boolean().optional().default(true),
-  includeReflection: z.boolean().optional().default(true),
+  tone: z.string().default('encouraging'),
+  audience: z.string().default('general'),
+  bibleVersion: z.string().default('NIV'),
+  includePrayer: z.boolean().default(true),
+  includeReflection: z.boolean().default(true),
 });
 
 // POST /api/generate/social
 export const socialSchema = z.object({
   topic: z.string().min(1, 'Topic is required'),
   scripture: z.string().optional(),
-  platform: z.string().optional().default('twitter'),
-  tone: z.string().optional().default('encouraging'),
-  bibleVersion: z.string().optional().default('NIV'),
+  platform: z.string().default('twitter'),
+  tone: z.string().default('encouraging'),
+  bibleVersion: z.string().default('NIV'),
   voiceInstructions: z.string().optional(),
 });

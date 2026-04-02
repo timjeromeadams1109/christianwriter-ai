@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { content } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { validate, contentSaveSchema } from '@/lib/validation';
+import type { NewContent } from '@/lib/db/schema';
 
 export async function GET() {
   try {
@@ -55,18 +56,20 @@ export async function POST(request: Request) {
       authorVoiceId,
     } = parsed.data;
 
+    const insertValues: NewContent = {
+      userId: session.user.id!,
+      type,
+      title,
+      inputParams,
+      generatedContent,
+      scriptureReferences,
+      authorVoiceId,
+      status: 'generated',
+    };
+
     const [newContent] = await db
       .insert(content)
-      .values({
-        userId: session.user.id!,
-        type,
-        title,
-        inputParams,
-        generatedContent,
-        scriptureReferences,
-        authorVoiceId,
-        status: 'generated',
-      })
+      .values(insertValues)
       .returning();
 
     return NextResponse.json(newContent);
