@@ -13,28 +13,28 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.74.0",
+    "@anthropic-ai/sdk": "^0.82.0",
     "@auth/drizzle-adapter": "^1.11.1",
     "@neondatabase/serverless": "^1.0.2",
     "@react-pdf/renderer": "^4.3.2",
-    "@sentry/nextjs": "^10.46.0",
+    "@sentry/nextjs": "^10.47.0",
     "@stack/core": "github:timjeromeadams1109/stack-core",
-    "ai": "^6.0.86",
+    "ai": "^6.0.142",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
-    "docx": "^9.5.3",
-    "drizzle-orm": "^0.45.1",
+    "docx": "^9.6.1",
+    "drizzle-orm": "^0.45.2",
     "file-saver": "^2.0.5",
-    "framer-motion": "^12.34.0",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.564.0",
     "next": "16.2.2",
     "next-auth": "^5.0.0-beta.30",
     "opossum": "^5.0.1",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-pdf": "^10.3.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-pdf": "^10.4.1",
     "stripe": "^20.3.1",
-    "tailwind-merge": "^3.4.1",
+    "tailwind-merge": "^3.5.0",
     "zod": "^3.23.0"
   },
   "overrides": {
@@ -53,6 +53,6 @@
     "eslint-config-next": "16.2.2",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "typescript-eslint": "^8.56.1"
+    "typescript-eslint": "^8.58.0"
   }
 }
