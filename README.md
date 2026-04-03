@@ -35,6 +35,7 @@ AI-powered writing tools for Christian content creators. Create devotionals, ser
 - Neon PostgreSQL database
 - Anthropic API key
 - Stripe account
+- Redis instance
 
 ### Installation
 
