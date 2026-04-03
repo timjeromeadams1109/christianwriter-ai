@@ -1,12 +1,23 @@
 import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { validate, registerSchema } from '@/lib/validation';
+import { registerRatelimit, checkRateLimit } from '@/lib/ratelimit';
 
 export async function POST(request: Request) {
   try {
+    const headersList = await headers();
+    const ip =
+      headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      headersList.get('x-real-ip') ??
+      'unknown';
+
+    const rateLimitResponse = await checkRateLimit(registerRatelimit, ip);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const body = await request.json();
     const parsed = validate(registerSchema, body);
     if ('error' in parsed) return parsed.error;

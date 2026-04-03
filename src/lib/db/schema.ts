@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, json, pgEnum, boolean, integer, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, json, pgEnum, boolean, integer, primaryKey, jsonb } from 'drizzle-orm/pg-core';
 
 // Enums
 export const contentTypeEnum = pgEnum('content_type', ['devotional', 'sermon', 'social']);
@@ -20,6 +20,10 @@ export const users = pgTable('users', {
   stripeSubscriptionId: text('stripe_subscription_id'),
   subscriptionTier: subscriptionTierEnum('subscription_tier').default('free').notNull(),
   subscriptionStatus: text('subscription_status'), // 'active', 'canceled', 'past_due', etc.
+  // MFA fields — mfa_secret is AES-256-GCM encrypted before storage
+  mfaEnabled: boolean('mfa_enabled').notNull().default(false),
+  mfaSecret: text('mfa_secret'),
+  mfaBackupCodes: jsonb('mfa_backup_codes').$type<string[]>().default([]),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
