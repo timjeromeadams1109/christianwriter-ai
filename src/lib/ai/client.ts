@@ -62,7 +62,7 @@ export async function generateContent(
     [{ role: 'user', content: prompt }]
   );
 
-  const textContent = response.content.find((block) => block.type === 'text');
+  const textContent = response.content.find((block: Anthropic.ContentBlock) => block.type === 'text');
   return textContent?.text ?? '';
 }
 
