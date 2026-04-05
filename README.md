@@ -109,6 +109,9 @@ christianwriter-ai/
 | `npm run db:migrate` | drizzle-kit migrate |
 | `npm run db:push` | drizzle-kit push |
 | `npm run db:studio` | drizzle-kit studio |
+| `npm run test` | vitest run |
+| `npm run test:watch` | vitest |
+| `npm run test:coverage` | vitest run --coverage |
 
 
 ## Deployment
