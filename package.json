@@ -16,7 +16,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.74.0",
+    "@anthropic-ai/sdk": "^0.82.0",
     "@auth/drizzle-adapter": "^1.11.1",
     "@neondatabase/serverless": "^1.0.2",
     "@react-pdf/renderer": "^4.3.2",
@@ -37,8 +37,8 @@
     "opossum": "^5.0.1",
     "otpauth": "^9.5.0",
     "pino": "^10.3.1",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "react-pdf": "^10.3.0",
     "stripe": "^20.3.1",
     "tailwind-merge": "^3.4.1",
