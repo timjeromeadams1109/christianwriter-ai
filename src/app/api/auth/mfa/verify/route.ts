@@ -25,7 +25,8 @@ const VerifySchema = z.object({
 });
 
 export function signMfaToken(userId: string): string {
-  const secret = process.env.NEXTAUTH_SECRET ?? process.env.MFA_ENCRYPTION_KEY ?? 'fallback';
+  const secret = process.env.NEXTAUTH_SECRET ?? process.env.MFA_ENCRYPTION_KEY;
+  if (!secret) throw new Error('NEXTAUTH_SECRET or MFA_ENCRYPTION_KEY is required');
   const payload = `${userId}:${Math.floor(Date.now() / 1000 / 300)}`; // 5-minute bucket
   return createHmac('sha256', secret).update(payload).digest('hex');
 }

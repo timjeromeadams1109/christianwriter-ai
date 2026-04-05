@@ -20,7 +20,6 @@ export async function GET() {
       columns: {
         subscriptionTier: true,
         subscriptionStatus: true,
-        stripeCustomerId: true,
       },
     });
 
@@ -34,7 +33,6 @@ export async function GET() {
     return NextResponse.json({
       subscriptionTier: user.subscriptionTier || 'free',
       subscriptionStatus: user.subscriptionStatus,
-      stripeCustomerId: user.stripeCustomerId,
     });
   } catch (error) {
     console.error('Subscription fetch error:', error);

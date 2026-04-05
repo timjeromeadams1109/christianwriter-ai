@@ -1,5 +1,6 @@
 import tseslint from "typescript-eslint";
 import nextPlugin from "@next/eslint-plugin-next";
+import securityConfig from './eslint-security.config.js';
 
 export default [
   ...tseslint.configs.recommended,
@@ -23,4 +24,5 @@ export default [
   {
     ignores: [".next/", "node_modules/"],
   },
+  ...securityConfig,
 ];

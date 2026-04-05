@@ -7,7 +7,8 @@ const MFA_VERIFY_PATH = '/auth/mfa-verify';
 async function verifyMfaCookie(cookie: string | undefined, userId: string): Promise<boolean> {
   if (!cookie || !userId) return false;
   try {
-    const secretStr = process.env.NEXTAUTH_SECRET ?? process.env.MFA_ENCRYPTION_KEY ?? 'fallback';
+    const secretStr = process.env.NEXTAUTH_SECRET ?? process.env.MFA_ENCRYPTION_KEY;
+    if (!secretStr) throw new Error('NEXTAUTH_SECRET or MFA_ENCRYPTION_KEY is required');
     const enc = new TextEncoder();
     const key = await crypto.subtle.importKey(
       'raw',
