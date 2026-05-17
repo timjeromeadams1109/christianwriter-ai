@@ -26,7 +26,7 @@ describe('GET /api/author-voice', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { GET } = await import('@/app/api/author-voice/route');
     const res = await GET();
     expect(res.status).toBe(401);
@@ -34,7 +34,7 @@ describe('GET /api/author-voice', () => {
 
   it('returns list of profiles for authenticated user', async () => {
     vi.mocked(auth).mockResolvedValue(MOCK_SESSION as never);
-    const mockDb = getDb() as Record<string, unknown>;
+    const mockDb = getDb() as unknown as Record<string, unknown>;
     (mockDb.orderBy as ReturnType<typeof vi.fn>).mockResolvedValue([
       { id: 'profile-1', name: 'My Voice', userId: MOCK_SESSION.user.id },
     ]);
@@ -50,7 +50,7 @@ describe('GET /api/author-voice', () => {
 describe('POST /api/author-voice/analyze', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const mockDb = getDb() as Record<string, unknown>;
+    const mockDb = getDb() as unknown as Record<string, unknown>;
     (mockDb.returning as ReturnType<typeof vi.fn>).mockResolvedValue([
       {
         id: 'profile-uuid-1',
@@ -69,7 +69,7 @@ describe('POST /api/author-voice/analyze', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/author-voice/analyze/route');
     const res = await POST(makeAnalyzeRequest({ name: 'Voice', sampleText: LONG_SAMPLE }));
     expect(res.status).toBe(401);

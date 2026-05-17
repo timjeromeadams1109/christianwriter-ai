@@ -27,7 +27,7 @@ describe('POST /api/generate/sermon', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/generate/sermon/route');
     const res = await POST(makeRequest({ topic: 'Grace', scripture: 'John 3:16' }));
     expect(res.status).toBe(401);
@@ -75,7 +75,7 @@ describe('POST /api/generate/devotional', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/generate/devotional/route');
     const res = await POST(makeRequest({ topic: 'Faith', scripture: 'Hebrews 11:1' }));
     expect(res.status).toBe(401);
@@ -109,7 +109,7 @@ describe('POST /api/generate/social', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/generate/social/route');
     const res = await POST(makeRequest({ topic: 'Hope' }));
     expect(res.status).toBe(401);
@@ -144,7 +144,7 @@ describe('POST /api/generate/journal-series', () => {
    */
   it('[SECURITY] returns 401 with DATABASE_URL set and no session', async () => {
     // DATABASE_URL is set by setup.ts — auth MUST fire
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/generate/journal-series/route');
     const res = await POST(makeRequest({ topic: 'Prayer', duration: 7 }));
     expect(res.status).toBe(401);

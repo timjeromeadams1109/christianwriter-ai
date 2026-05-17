@@ -39,7 +39,7 @@ describe('POST /api/auth/mfa/setup', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/auth/mfa/setup/route');
     const res = await POST();
     expect(res.status).toBe(401);
@@ -67,7 +67,7 @@ describe('POST /api/auth/mfa/verify-setup', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/auth/mfa/verify-setup/route');
     const res = await POST(makeRequest({ code: '123456' }));
     expect(res.status).toBe(401);
@@ -131,7 +131,7 @@ describe('POST /api/auth/mfa/verify', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/auth/mfa/verify/route');
     const res = await POST(makeRequest({ code: '123456' }));
     expect(res.status).toBe(401);
@@ -204,7 +204,7 @@ describe('POST /api/auth/mfa/disable', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/auth/mfa/disable/route');
     const res = await POST(makeRequest({ code: '123456' }));
     expect(res.status).toBe(401);
@@ -255,7 +255,7 @@ describe('GET /api/user/mfa-status', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { GET } = await import('@/app/api/user/mfa-status/route');
     const res = await GET();
     expect(res.status).toBe(401);
