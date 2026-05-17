@@ -21,7 +21,7 @@
     "@neondatabase/serverless": "^1.0.2",
     "@react-pdf/renderer": "^4.3.2",
     "@sentry/nextjs": "^10.46.0",
-    "@stack/core": "git+https://github.com/timjeromeadams1109/stack-core.git#abcfe570f0e0a20a9d1fd7caf855fbbd70686dd2",
+    "@stack/core": "git+https://github.com/timjeromeadams1109/stack-core.git#e2cb5375aa60f09bcc6c5d5e50091754bed29986",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.37.0",
     "ai": "^6.0.86",
