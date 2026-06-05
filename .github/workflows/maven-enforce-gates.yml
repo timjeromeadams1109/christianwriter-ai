@@ -1,0 +1,149 @@
+name: Maven Quality Gates — Tests + Security
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  checks: write
+  statuses: write
+
+jobs:
+  tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    continue-on-error: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: |
+          if [ -f "bun.lockb" ]; then
+            bun install
+          else
+            npm install
+          fi
+
+      - name: Run linting
+        run: |
+          if [ -f "package.json" ] && grep -q '"lint"' package.json; then
+            bun run lint || npm run lint
+          else
+            echo "No lint script found"
+          fi
+        continue-on-error: true
+
+      - name: Run type checking
+        run: |
+          if [ -f "tsconfig.json" ]; then
+            bun exec tsc --noEmit || npx tsc --noEmit
+          fi
+        continue-on-error: true
+
+      - name: Run tests
+        run: |
+          if [ -f "package.json" ] && grep -q '"test"' package.json; then
+            bun run test || npm test
+          else
+            echo "No test script found — skipping"
+          fi
+        continue-on-error: false
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    continue-on-error: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Scanning for hardcoded secrets..."
+
+          # Check for common secret patterns
+          if grep -r "PRIVATE_KEY\|API_KEY\|SECRET\|PASSWORD" . \
+            --include="*.ts" --include="*.js" --include="*.tsx" --include="*.jsx" \
+            --exclude-dir=node_modules --exclude-dir=.git \
+            | grep -v "process.env\|ENV\|\.env" > /tmp/secrets.txt 2>&1; then
+
+            if [ -s /tmp/secrets.txt ]; then
+              echo "⚠ WARNING: Possible hardcoded secrets found:"
+              cat /tmp/secrets.txt | head -20
+              exit 1
+            fi
+          fi
+
+          echo "✓ No obvious hardcoded secrets found"
+
+      - name: Dependency vulnerability scan
+        run: |
+          echo "Scanning dependencies for vulnerabilities..."
+          if [ -f "package.json" ]; then
+            npm audit --audit-level=moderate || true
+          fi
+          echo "✓ Dependency scan complete"
+
+  gates:
+    name: Enforce Quality Gates
+    needs: [tests, security]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.tests.result }}" != "success" ]; then
+            echo "❌ Tests FAILED — merge blocked"
+            exit 1
+          else
+            echo "✅ Tests PASSED"
+          fi
+
+      - name: Check security results
+        run: |
+          if [ "${{ needs.security.result }}" != "success" ]; then
+            echo "❌ Security scan FAILED — merge blocked"
+            exit 1
+          else
+            echo "✅ Security scan PASSED"
+          fi
+
+      - name: Post verdict
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const testsPassed = '${{ needs.tests.result }}' === 'success';
+            const securityPassed = '${{ needs.security.result }}' === 'success';
+            const allPassed = testsPassed && securityPassed;
+
+            const verdict = allPassed ? '✅ APPROVED' : '❌ BLOCKED';
+            const details = [
+              testsPassed ? '✅ Tests: PASSED' : '❌ Tests: FAILED',
+              securityPassed ? '✅ Security: PASSED' : '❌ Security: FAILED'
+            ].join('\n');
+
+            const body = `## Maven Quality Gate Verdict: ${verdict}\n\n${details}\n\n---\n*Automated enforcement by Maven. PR cannot merge until all gates pass.*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+            if (!allPassed) {
+              core.setFailed('Quality gates failed — merge blocked');
+            }
