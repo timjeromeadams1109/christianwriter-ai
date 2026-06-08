@@ -30,7 +30,7 @@ describe('GET /api/content', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { GET } = await import('@/app/api/content/route');
     const res = await GET();
     expect(res.status).toBe(401);
@@ -38,7 +38,7 @@ describe('GET /api/content', () => {
 
   it('returns an array for authenticated user', async () => {
     vi.mocked(auth).mockResolvedValue(MOCK_SESSION as never);
-    const mockDb = getDb() as Record<string, unknown>;
+    const mockDb = getDb() as unknown as Record<string, unknown>;
     // The route chains: db.select().from().where().orderBy() — make it resolve
     (mockDb.orderBy as ReturnType<typeof vi.fn>).mockResolvedValue([
       { id: '1', title: 'My Sermon', userId: MOCK_SESSION.user.id },
@@ -54,14 +54,14 @@ describe('GET /api/content', () => {
 describe('POST /api/content', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const mockDb = getDb() as Record<string, unknown>;
+    const mockDb = getDb() as unknown as Record<string, unknown>;
     (mockDb.returning as ReturnType<typeof vi.fn>).mockResolvedValue([
       { id: 'content-uuid-1', ...VALID_CONTENT, userId: MOCK_SESSION.user.id, status: 'generated' },
     ]);
   });
 
   it('returns 401 when not authenticated', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const { POST } = await import('@/app/api/content/route');
     const res = await POST(makeRequest(VALID_CONTENT));
     expect(res.status).toBe(401);
