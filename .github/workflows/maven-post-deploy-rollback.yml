@@ -1,0 +1,100 @@
+name: Post-Deploy Health Check & Auto-Rollback
+
+on:
+  deployment_status
+
+permissions:
+  contents: write
+  deployments: write
+
+jobs:
+  health-check:
+    name: Monitor Deployment Health
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get deployment URL
+        id: deploy-url
+        run: |
+          # Extract Vercel preview URL or production domain from deployment
+          DEPLOY_URL="${{ github.event.deployment.environment_url }}"
+          if [ -z "$DEPLOY_URL" ]; then
+            # Fallback: use production domain
+            DEPLOY_URL="https://${{ github.event.repository.name }}.vercel.app"
+          fi
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Deployment URL: $DEPLOY_URL"
+
+      - name: Get previous commit
+        id: prev-commit
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD~1)
+          echo "commit=$PREV_COMMIT" >> $GITHUB_OUTPUT
+          echo "Previous commit: $PREV_COMMIT"
+
+      - name: Monitor health (5 minutes)
+        id: health-check
+        run: |
+          echo "Starting 5-minute health check..."
+
+          CHECK_INTERVAL=10
+          MAX_CHECKS=30
+          FAILURE_COUNT=0
+          FAILURE_THRESHOLD=3
+
+          for i in $(seq 1 $MAX_CHECKS); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${{ steps.deploy-url.outputs.url }}" 2>/dev/null || echo "000")
+
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "[$i/$MAX_CHECKS] ✓ HTTP $HTTP_CODE"
+              FAILURE_COUNT=0
+            else
+              echo "[$i/$MAX_CHECKS] ✗ HTTP $HTTP_CODE"
+              ((FAILURE_COUNT++))
+
+              if [ $FAILURE_COUNT -ge $FAILURE_THRESHOLD ]; then
+                echo "HEALTH_STATUS=FAILED" >> $GITHUB_OUTPUT
+                exit 1
+              fi
+            fi
+
+            sleep $CHECK_INTERVAL
+          done
+
+          echo "HEALTH_STATUS=PASSED" >> $GITHUB_OUTPUT
+
+      - name: Rollback if health failed
+        if: failure() && steps.health-check.outcome == 'failure'
+        run: |
+          echo "❌ DEPLOYMENT FAILED — Health checks failed"
+          echo "Triggering rollback to: ${{ steps.prev-commit.outputs.commit }}"
+
+          # For Vercel, revert the commit and re-push
+          git revert --no-edit HEAD
+          git push origin main
+
+          echo "Rollback triggered — previous version re-deployed"
+
+      - name: Alert Tim on rollback
+        if: failure() && steps.health-check.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `⚠️ **DEPLOYMENT ROLLBACK TRIGGERED**\n\n- Deployment: ${{ github.event.repository.name }}\n- URL: ${{ steps.deploy-url.outputs.url }}\n- Reason: Health checks failed\n- Action: Automatically rolled back to ${{ steps.prev-commit.outputs.commit }}\n\n**Next steps:**\n1. Investigate what broke\n2. Fix the issue\n3. Re-deploy\n\n*Automatic rollback by Maven*`
+            });
+
+      - name: Report success
+        if: success() && steps.health-check.outcome == 'success'
+        run: |
+          echo "✅ DEPLOYMENT HEALTHY"
+          echo "All post-deploy health checks passed."
+          echo "Production is stable and serving correctly."
